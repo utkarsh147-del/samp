@@ -5,8 +5,7 @@ import numpy as np
 def main():
     st.title("Live Camera Feed")
     st.write("Click the button below to open the camera:")
-    for i in range(6):
-        print(i)
+    
     # Try to open the camera with different index values
     if st.button("Open Camera"):
         cap = None
