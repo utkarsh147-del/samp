@@ -6,11 +6,15 @@ def main():
     st.title("Live Camera Feed")
     st.write("Click the button below to open the camera:")
 
-    # Create a button to start the camera
+    # Try to open the camera with different index values
     if st.button("Open Camera"):
-        # Initialize the camera
-        cap = cv2.VideoCapture(0)
-        if not cap.isOpened():
+        cap = None
+        for i in range(6):
+            cap = cv2.VideoCapture(i)
+            if cap.isOpened():
+                break
+
+        if cap is None or not cap.isOpened():
             st.error("Failed to open camera.")
             return
 
