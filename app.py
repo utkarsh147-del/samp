@@ -11,6 +11,7 @@ def main():
         cap = None
         for i in range(6):
             cap = cv2.VideoCapture(i)
+            print(i)
             if cap.isOpened():
                 break
 
