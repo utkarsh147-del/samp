@@ -1,7 +1,8 @@
+import asyncio
 import streamlit as st
 import av
 import aiortc
-#e
+
 from streamlit_webrtc import (
     VideoProcessorBase,
     WebRtcMode,
@@ -15,7 +16,6 @@ class StunVideoProcessor(VideoProcessorBase):
 
     async def setup(self):
         # Configure STUN and TURN servers
-        
         ice_servers=[
          {"urls": "stun:bn-turn1.xirsys.com"},
             {
@@ -38,9 +38,13 @@ class StunVideoProcessor(VideoProcessorBase):
         configuration=configuration
     )
 
-# Run the WebRTC streamer
-webrtc_streamer(
-    key="eutkarsh",
-    mode=WebRtcMode.SENDRECV,
-    video_processor_factory=StunVideoProcessor,
-)
+async def main():
+    # Run the WebRTC streamer
+    webrtc_ctx = webrtc_streamer(
+        key="example",
+        mode=WebRtcMode.SENDRECV,
+        video_processor_factory=StunVideoProcessor,
+    )
+
+if __name__ == "__main__":
+    asyncio.run(main())
