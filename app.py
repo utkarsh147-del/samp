@@ -3,6 +3,8 @@ import streamlit as st
 import av
 import aiortc
 
+
+
 from streamlit_webrtc import (
     VideoProcessorBase,
     WebRtcMode,
@@ -16,22 +18,12 @@ class StunVideoProcessor(VideoProcessorBase):
 
     async def setup(self):
         # Configure STUN and TURN servers
-        ice_servers=[
-         {"urls": "stun:bn-turn1.xirsys.com"},
-            {
-            "urls": [
-                "turn:bn-turn1.xirsys.com:80?transport=udp",
-                "turn:bn-turn1.xirsys.com:3478?transport=udp",
-                "turn:bn-turn1.xirsys.com:80?transport=tcp",
-                "turn:bn-turn1.xirsys.com:3478?transport=tcp",
-                "turns:bn-turn1.xirsys.com:443?transport=tcp",
-                "turns:bn-turn1.xirsys.com:5349?transport=tcp"
-            ],
-            "username": "TBPiEMw7tX24LLZvFW8ymeB-DwRFYTzQ8eVh1B3yroLEeERJ4lBh7HQKQXXD6gJaAAAAAGRUyXJ1dGthcnNoMzU2",
-            "credential": "87bac70a-eb25-11ed-b31b-0242ac140004"
-        }
-    ]
+        iceServers: [{urls: [ "stun:bn-turn1.xirsys.com" ]}, {username: "TBPiEMw7tX24LLZvFW8ymeB-DwRFYTzQ8eVh1B3yroLEeERJ4lBh7HQKQXXD6gJaAAAAAGRUyXJ1dGthcnNoMzU2", credential: "87bac70a-eb25-11ed-b31b-0242ac140004",urls: ["turn:bn-turn1.xirsys.com:80?transport=udp","turn:bn-turn1.xirsys.com:3478?transport=udp","turn:bn-turn1.xirsys.com:80?transport=tcp","turn:bn-turn1.xirsys.com:3478?transport=tcp","turns:bn-turn1.xirsys.com:443?transport=tcp","turns:bn-turn1.xirsys.com:5349?transport=tcp"]}]
         configuration = aiortc.RTCConfiguration(iceServers=ice_servers)
+
+
+
+
 
     # Create WebRTC connection
         self.webrtc_ctx = self._create_webrtc_context(
