@@ -1,11 +1,22 @@
 import streamlit as st
 import av
-import numpy as np
-from streamlit_webrtc import webrtc_streamer
+import asyncio
+from streamlit_webrtc import VideoProcessorBase, WebRtcMode, webrtc_streamer
 
-def main():
-    st.header("WebRTC camera demo")
-    webrtc_streamer(key="camera")
+class VideoProcessor(VideoProcessorBase):
+    async def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
+        # Process the video frame here
+        return frame
+
+async def main():
+    webrtc_ctx = webrtc_streamer(
+        key="example",
+        mode=WebRtcMode.SENDRECV,
+        video_processor_factory=VideoProcessor,
+    )
 
 if __name__ == "__main__":
-    main()
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        st.error("Error: {e}")
