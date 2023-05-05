@@ -1,38 +1,31 @@
 import streamlit as st
-from twilio.jwt.access_token import AccessToken
-from twilio.jwt.access_token.grants import VideoGrant
-from streamlit_webrtc import (
-    ClientSettings,
-    WebRtcMode,
-    webrtc_streamer,
-    VideoProcessorBase,
+from streamlit_webrtc import webrtc_streamer, RTCConfiguration, VideoProcessorBase
+
+# Set up the RTCConfiguration with your TURN server details
+rtc_configuration = RTCConfiguration(
+    {
+        "iceServers": [
+            {
+                "urls": ["turn:bn-turn1.xirsys.com:80?transport=udp",
+       "turn:bn-turn1.xirsys.com:3478?transport=udp",
+       "turn:bn-turn1.xirsys.com:80?transport=tcp",
+       "turn:bn-turn1.xirsys.com:3478?transport=tcp",
+       "turns:bn-turn1.xirsys.com:443?transport=tcp",
+       "turns:bn-turn1.xirsys.com:5349?transport=tcp"],
+                "username": "TBPiEMw7tX24LLZvFW8ymeB-DwRFYTzQ8eVh1B3yroLEeERJ4lBh7HQKQXXD6gJaAAAAAGRUyXJ1dGthcnNoMzU2",
+                "credential": "87bac70a-eb25-11ed-b31b-0242ac140004",
+            }
+        ]
+    }
 )
 
-class TwilioVideoProcessor(VideoProcessorBase):
-    async def process_video(self, frame):
-        return frame
+# Create a custom VideoProcessor class to use with the WebRTC component
+class VideoProcessor(VideoProcessorBase):
+    pass
 
-    async def setup(self):
-        # Set up Twilio access token and VideoGrant
-        account_sid = "ACd75dbc4fc896ef550cf165903ea08632"
-        auth_token = "0d8d76ce54524203b61fe72b55f36331"
-        token = AccessToken(account_sid, auth_token, identity="user")
-
-        video_grant = VideoGrant(room="test")
-        token.add_grant(video_grant)
-
-        # Create Twilio WebRTC connection
-        self.webrtc_ctx = self._create_webrtc_context(
-            settings=ClientSettings(
-                rtc_configuration={"iceServers": token.ice_servers},
-                media_stream_constraints={"video": True, "audio": False},
-                offer_options={},
-            ),
-            mode=WebRtcMode.SENDRECV,
-        )
-
+# Use the webrtc_streamer function with the custom rtc_configuration and VideoProcessor
 webrtc_streamer(
     key="example",
-    mode=WebRtcMode.SENDRECV,
-    video_processor_factory=TwilioVideoProcessor,
+    rtc_configuration=rtc_configuration,
+    video_processor_factory=VideoProcessor,
 )
