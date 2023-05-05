@@ -1,30 +1,26 @@
-import cv2
 import streamlit as st
+from streamlit.components.v1 import html
 
 def main():
     st.title("Camera App")
 
-    # Open the camera and set the resolution
-    cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    # Define the HTML code for the video element
+    html_code = """
+    <video id="video" width="640" height="100" autoplay></video>
+    <script>
+    const video = document.getElementById('video');
+    navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => {
+        video.srcObject = stream;
+    })
+    .catch(error => {
+        console.error(error);
+    });
+    </script>
+    """
 
-    # Create a placeholder for the video stream
-    video_placeholder = st.empty()
-
-    while True:
-        ret, frame = cap.read()
-
-        if not ret:
-            st.error("Failed to capture frame from camera")
-            break
-
-        # Convert the frame to RGB color space and display it in the app
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        video_placeholder.image(frame)
-
-    # Release the camera and close the app
-    cap.release()
+    # Display the video element in the app
+    html(html_code)
 
 if __name__ == '__main__':
     main()
