@@ -1,23 +1,45 @@
-import cv2
-from streamlit_webrtc import VideoTransformerBase, webrtc_streamer
+import streamlit as st
+import av
+import aiortc
 
-faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+from streamlit_webrtc import (
+    VideoProcessorBase,
+    WebRtcMode,
+    webrtc_streamer,
+)
 
+class StunVideoProcessor(VideoProcessorBase):
+    async def process_video(self, frame: av.VideoFrame) -> av.VideoFrame:
+        # Process video frames here if needed
+        return frame
 
-class VideoTransformer(VideoTransformerBase):
-    def _init_(self):
-        self.i = 0
+    async def setup(self):
+        # Configure STUN and TURN servers
+        configuration = aiortc.RTCConfiguration(
+            iceServers=[{
+   urls: [ "stun:bn-turn1.xirsys.com" ]
+}, {
+   username: "TBPiEMw7tX24LLZvFW8ymeB-DwRFYTzQ8eVh1B3yroLEeERJ4lBh7HQKQXXD6gJaAAAAAGRUyXJ1dGthcnNoMzU2",
+   credential: "87bac70a-eb25-11ed-b31b-0242ac140004",
+   urls: [
+       "turn:bn-turn1.xirsys.com:80?transport=udp",
+       "turn:bn-turn1.xirsys.com:3478?transport=udp",
+       "turn:bn-turn1.xirsys.com:80?transport=tcp",
+       "turn:bn-turn1.xirsys.com:3478?transport=tcp",
+       "turns:bn-turn1.xirsys.com:443?transport=tcp",
+       "turns:bn-turn1.xirsys.com:5349?transport=tcp"
+   ]
+}]
+        )
 
-    def transform(self, frame):
-        img = frame.to_ndarray(format="bgr24")
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        faces = faceCascade.detectMultiScale(gray, 1.3, 5)
-        i =self.i+1
-        for (x, y, w, h) in faces:
-            cv2.rectangle(img, (x, y), (x + w, y + h), (95, 207, 30), 3)
-            cv2.rectangle(img, (x, y - 40), (x + w, y), (95, 207, 30), -1)
-            cv2.putText(img, 'F-' + str(i), (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+        # Create WebRTC connection
+        self.webrtc_ctx = self._create_webrtc_context(
+            configuration=configuration
+        )
 
-        return img
-
-webrtc_streamer(key="example", video_transformer_factory=VideoTransformer)
+# Run the WebRTC streamer
+webrtc_streamer(
+    key="example",
+    mode=WebRtcMode.SENDRECV,
+    video_processor_factory=StunVideoProcessor,
+)
