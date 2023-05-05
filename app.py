@@ -28,7 +28,7 @@ class StunVideoProcessor(VideoProcessorBase):
                 "turns:bn-turn1.xirsys.com:5349?transport=tcp"
             ],
             "username": "TBPiEMw7tX24LLZvFW8ymeB-DwRFYTzQ8eVh1B3yroLEeERJ4lBh7HQKQXXD6gJaAAAAAGRUyXJ1dGthcnNoMzU2",
-            "credential": "87bac70a-eb25-11ed-b31b-0242ac140004
+            "credential": "87bac70a-eb25-11ed-b31b-0242ac140004"
         }
     ]
         configuration = aiortc.RTCConfiguration(iceServers=ice_servers)
