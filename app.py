@@ -1,22 +1,30 @@
+import cv2
 import streamlit as st
-import av
-import asyncio
-from streamlit_webrtc import VideoProcessorBase, WebRtcMode, webrtc_streamer
 
-class VideoProcessor(VideoProcessorBase):
-    async def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
-        # Process the video frame here
-        return frame
+def main():
+    st.title("Camera App")
 
-async def main():
-    webrtc_ctx = webrtc_streamer(
-        key="example",
-        mode=WebRtcMode.SENDRECV,
-        video_processor_factory=VideoProcessor,
-    )
+    # Open the camera and set the resolution
+    cap = cv2.VideoCapture(0)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
-if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except Exception as e:
-        st.error("Error: {e}")
+    # Create a placeholder for the video stream
+    video_placeholder = st.empty()
+
+    while True:
+        ret, frame = cap.read()
+
+        if not ret:
+            st.error("Failed to capture frame from camera")
+            break
+
+        # Convert the frame to RGB color space and display it in the app
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        video_placeholder.image(frame)
+
+    # Release the camera and close the app
+    cap.release()
+
+if __name__ == '__main__':
+    main()
