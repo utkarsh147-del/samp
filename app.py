@@ -1,26 +1,23 @@
-import streamlit as st
-from streamlit.components.v1 import html
+import cv2
+from streamlit_webrtc import VideoTransformerBase, webrtc_streamer
 
-def main():
-    st.title("Camera App")
+faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
-    # Define the HTML code for the video element
-    html_code = """
-    <video id="video" width="640" height="100" autoplay></video>
-    <script>
-    const video = document.getElementById('video');
-    navigator.mediaDevices.getUserMedia({ video: true })
-    .then(stream => {
-        video.srcObject = stream;
-    })
-    .catch(error => {
-        console.error(error);
-    });
-    </script>
-    """
 
-    # Display the video element in the app
-    html(html_code)
+class VideoTransformer(VideoTransformerBase):
+    def _init_(self):
+        self.i = 0
 
-if __name__ == '__main__':
-    main()
+    def transform(self, frame):
+        img = frame.to_ndarray(format="bgr24")
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        faces = faceCascade.detectMultiScale(gray, 1.3, 5)
+        i =self.i+1
+        for (x, y, w, h) in faces:
+            cv2.rectangle(img, (x, y), (x + w, y + h), (95, 207, 30), 3)
+            cv2.rectangle(img, (x, y - 40), (x + w, y), (95, 207, 30), -1)
+            cv2.putText(img, 'F-' + str(i), (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+
+        return img
+
+webrtc_streamer(key="example", video_transformer_factory=VideoTransformer)
